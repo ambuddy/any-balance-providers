@@ -20,29 +20,37 @@ function getRates(bank)
 	
 	if(html)
 	{
-		if(prefs.isDebug) { 
-			for(var i=0; i<html.length; i=i+790)
-				trace(html.substring(i, i+790)); 
-		}
+		//var body 	= html.match(/<body([\s\S]+)<\/body>/i)[0];
+		var jQ		= $(html);
+		
+		if(prefs.isDebug) { for(var i=0; i<html.length; i=i+790) trace(html.substring(i, i+790)); }
 		
 		if(bank == 'mkb')
 		{
-			//var body 		= html.match(/<body([\s\S]+)<\/body>/i)[0];
-			var jQ			= $(html);
-			var cursy		= jQ.find('div.tabs__content.tabs__content_cards span');						trace('Найдено курсов МКБ', cursy.length);
+			var cursy		= jQ.find('div.tabs__content.tabs__content_cards span');						trace('Найдено курсов МКБ:', cursy.length);
 			
 			if(cursy.length)
 			{
 				cursy		= $.makeArray(cursy).map(function(item, i){ return parseFloat( $(item).text() ).toFixed(4); });
-				
-				cursy.forEach(function(item,i){ trace('Читаем курсы:', i, '=', cursy[i]); });
-				
-				rates			= {
-					'usd'	: [cursy[0], cursy[1]],
-					'eur'	: [cursy[3], cursy[4]]
+				rates		= {
+					'usd'	: {buy:cursy[0], sell:cursy[1]},
+					'eur'	: {buy:cursy[3], sell:cursy[4]}
 				};
-			} else {
-				trace('Не найдено ни одного курса МКБ');
+				cursy.forEach(function(item,i){ trace('Читаем курсы:', i, '=', cursy[i]); });
+			}
+		}
+		else if(bank == 'sber')
+		{
+			var cursy		= jQ.find('span.rates-current__rate-value');									trace('Найдено курсов Сбербанк:', cursy.length);
+			
+			if(cursy.length)
+			{
+				cursy		= $.makeArray(cursy).map(function(item, i){ return parseFloat( $(item).text() ).toFixed(4); });
+				rates		= {
+					'usd'	: {buy:cursy[2], sell:cursy[3]},
+					'eur'	: {buy:cursy[0], sell:cursy[1]}
+				};
+				cursy.forEach(function(item,i){ trace('Читаем курсы:', i, '=', cursy[i]); });
 			}
 		}
 	} else {
@@ -62,20 +70,20 @@ function main()
 	
 	if(isAvailable('mkb', prefs) && (rates = getRates('mkb')))
 	{
-		result['rate_mkb_usd_buy']		= rates['usd'][0] || null;
-		result['rate_mkb_usd_sell']		= rates['usd'][1] || null;
-		result['rate_mkb_eur_buy']		= rates['eur'][0] || null;
-		result['rate_mkb_eur_sell']		= rates['eur'][1] || null;
+		result['rate_mkb_usd_buy']		= rates.usd.buy || null;
+		result['rate_mkb_usd_sell']		= rates.usd.sell || null;
+		result['rate_mkb_eur_buy']		= rates.eur.buy || null;
+		result['rate_mkb_eur_sell']		= rates.eur.sell || null;
 	}
 	
 	if(isAvailable('sber', prefs))
 	{
 		var rates	= getRates('sber');
 		
-		result['rate_sber_usd_buy']		= rates['usd'][0] || null;
-		result['rate_sber_usd_sell']	= rates['usd'][1] || null;
-		result['rate_sber_eur_buy']		= rates['eur'][0] || null;
-		result['rate_sber_eur_sell']	= rates['eur'][1] || null;
+		result['rate_sber_usd_buy']		= rates.usd.buy || null;
+		result['rate_sber_usd_sell']	= rates.usd.sell || null;
+		result['rate_sber_eur_buy']		= rates.eur.buy || null;
+		result['rate_sber_eur_sell']	= rates.eur.sell || null;
 	}
 	
 	AnyBalance.setResult(result);
