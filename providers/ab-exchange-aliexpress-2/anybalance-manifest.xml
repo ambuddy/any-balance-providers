@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <provider>
-  <id major_version="1" version="3">ab-exchange-aliexpress-2</id>
+  <id major_version="1" version="4">ab-exchange-aliexpress-2</id>
   <name>Курс Алиэкспресс 2</name>
   <description html="true"><![CDATA[
-  <p>Определяет внутренний курс доллара в интернет-магазине Алиэкспресс (AliExpress) <a href="https://www.aliexpress.com"/>https://www.aliexpress.com/</a></p>
+  <p>Определяет внутренний курс доллара в интернет-магазине <a href="https://www.aliexpress.com"/>AliExpress</a> (Алиэкспресс)</p>
   ]]></description>
-  <author>Ambuddy &lt;ambuddy@mail.ru&gt;</author>
+  <author>Ambuddy &lt;ambd.anybalance@mail.ru&gt;</author>
   <depends>
     <module id="library"/>
   </depends>
