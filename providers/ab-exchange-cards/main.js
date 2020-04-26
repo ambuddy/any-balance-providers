@@ -12,38 +12,42 @@ var urls = {
 	'sber'	: 'https://www.sberbank.ru/ru/quotes/currenciescards'
 };
 
-function getRates(banks, currs)
+function getRates(bank)
 {
-	var rates		= {};
+	var rates		= null;
 	var prefs		= AnyBalance.getPreferences();
+	var html		= AnyBalance.requestGet(urls[bank], g_headers);
 	
-	var html		= AnyBalance.requestGet(urls["mkb"], g_headers);
-	
-	if(prefs.isDebug)
+	if(html)
 	{
-		for(var i=0; i<html.length; i=i+790) trace(html.substring(i, i+790));
+		if(prefs.isDebug) { 
+			for(var i=0; i<html.length; i=i+790)
+				trace(html.substring(i, i+790)); 
+		}
+		
+		if(bank == 'mkb')
+		{
+			//var body 		= html.match(/<body([\s\S]+)<\/body>/i)[0];
+			var jQ			= $(html);
+			var cursy		= jQ.find('div.tabs__content.tabs__content_cards span');						trace('Найдено курсов МКБ', cursy.length);
+			
+			if(cursy.length)
+			{
+				cursy		= $.makeArray(cursy).map(function(item, i){ return parseFloat( $(item).text() ).toFixed(4); });
+				
+				cursy.forEach(function(item,i){ trace('Читаем курсы:', i, '=', cursy[i]); });
+				
+				rates			= {
+					'usd'	: [cursy[0], cursy[1]],
+					'eur'	: [cursy[3], cursy[4]]
+				};
+			} else {
+				trace('Не найдено ни одного курса МКБ');
+			}
+		}
+	} else {
+		trace('Не удалось загрузить данные для банка', bank);
 	}
-	
-	//var body 		= html.match(/<body([\s\S]+)<\/body>/i)[0];
-	
-	var jQ			= $(html);
-	
-	var cursy		= $.makeArray(jQ.find('div.tabs__content.tabs__content_cards span')).map(function(item, i)
-	{
-		return parseFloat( $(item).text() ).toFixed(4);
-	});
-	
-	trace("курсы МКБ.length", cursy.length);
-	
-	for(var i=0; i<cursy.length; i++)
-	{
-		trace('курсы МКБ:', i, "=", cursy[i]);
-	}
-	
-	rates["mkb"]	= {
-		'usd'	: [cursy[0], cursy[1]],
-		'eur'	: [cursy[3], cursy[4]]
-	};
 	
 	return rates;
 }
@@ -53,27 +57,41 @@ function main()
 	AnyBalance.setDefaultCharset('utf-8');
 	
 	var prefs		= AnyBalance.getPreferences();
-	var rates		= getRates();
+	var result		= {success: true};
+	var rates		= null;
 	
-	/* if(!priceFrom)
+	if(isAvailable('mkb', prefs) && (rates = getRates('mkb')))
 	{
-		throw new AnyBalance.Error('Не удалось найти цену', true);
-	} */
-
-	var result = {
-		success				: true,
-		rate_mkb_usd_buy	: rates['mkb']['usd'][0],
-		rate_mkb_usd_sell	: rates['mkb']['usd'][1],
-		rate_mkb_eur_buy	: rates['mkb']['eur'][0],
-		rate_mkb_eur_sell	: rates['mkb']['eur'][1]
-	};
+		result['rate_mkb_usd_buy']		= rates['usd'][0] || null;
+		result['rate_mkb_usd_sell']		= rates['usd'][1] || null;
+		result['rate_mkb_eur_buy']		= rates['eur'][0] || null;
+		result['rate_mkb_eur_sell']		= rates['eur'][1] || null;
+	}
 	
-	if(AnyBalance.isAvailable('date'))
+	if(isAvailable('sber', prefs))
 	{
-		result.date = +new Date();
+		var rates	= getRates('sber');
+		
+		result['rate_sber_usd_buy']		= rates['usd'][0] || null;
+		result['rate_sber_usd_sell']	= rates['usd'][1] || null;
+		result['rate_sber_eur_buy']		= rates['eur'][0] || null;
+		result['rate_sber_eur_sell']	= rates['eur'][1] || null;
 	}
 	
 	AnyBalance.setResult(result);
+}
+
+function isAvailable(bank, prefs)
+{
+	trace("isAvailable", bank);
+	
+	for(var i in prefs)
+	{
+		trace("isAvailable", i, prefs[i], (i.indexOf('counter')>-1 && AnyBalance.isAvailable(prefs[i])));
+		
+		if(i.indexOf('counter')>-1 && prefs[i].indexOf('rate_'+bank)>-1 && AnyBalance.isAvailable(prefs[i])) return true;
+	}
+	return false;
 }
 
 function trace(params)

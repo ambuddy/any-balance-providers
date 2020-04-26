@@ -22,7 +22,6 @@
     <counter id="rate_mkb_usd_sell" name="МКБ продает USD" units=""/>
     <counter id="rate_mkb_eur_buy" name="МКБ купит EUR " units=""/>
     <counter id="rate_mkb_eur_sell" name="МКБ продает EUR" units=""/>
-    <counter id="date" name="Дата" type="time" format="dd/MM/yyyy"/>
   </counters>
   <keywords>обмен валют, банк, карты</keywords>
   <type>exchange, rates</type>
