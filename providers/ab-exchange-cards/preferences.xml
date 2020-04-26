@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen>
+	
+	<CheckBoxPreference
+		title="Дебаг"
+		defaultValue="false"
+		summaryOn="Сейчас выводится доп. информация"
+		summaryOff="Сейчас доп. информация не выводится"
+		key="isDebug" />
+	
+</PreferenceScreen>
