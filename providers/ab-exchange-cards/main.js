@@ -21,52 +21,29 @@ function getRates(banks, currs)
 	
 	if(prefs.isDebug)
 	{
-		for(var i=0; i<html.length; i=i+790) AnyBalance.trace(html.substring(i, i+790));
+		for(var i=0; i<html.length; i=i+790) trace(html.substring(i, i+790));
 	}
 	
-	var body 		= html.match(/<body(.+)>/gi)[0];
-	trace('body =', body);
-	//var xmlDoc	= $.parseXML(body);
+	//var body 		= html.match(/<body([\s\S]+)<\/body>/i)[0];
 	
 	var jQ			= $(html);
 	
-	var cursy		= jQ.find('div.tabs__content.tabs__content_cards span').map(function(item, i)
+	var cursy		= $.makeArray(jQ.find('div.tabs__content.tabs__content_cards span')).map(function(item, i)
 	{
-		trace('курсы МКБ (2):', i, item);
-		
-		return $(item).text();
+		return parseFloat( $(item).text() ).toFixed(4);
 	});
 	
-	AnyBalance.trace("cursy.length = " + cursy.length);
+	trace("курсы МКБ.length", cursy.length);
 	
 	for(var i=0; i<cursy.length; i++)
 	{
-		AnyBalance.trace('курсы МКБ (3):',i,"=",cursy[i]);
-		
-		//cursy[i]	= parseFloat( parseFloat( cursy[i] ).toFixed(4) );
-		
-		//AnyBalance.trace('курсы МКБ (2): ' + i + " = " + cursy[i]);
+		trace('курсы МКБ:', i, "=", cursy[i]);
 	}
 	
 	rates["mkb"]	= {
-		"usd"	: [cursy[0], cursy[1]],
-		"eur"	: [cursy[3], cursy[4]]
+		'usd'	: [cursy[0], cursy[1]],
+		'eur'	: [cursy[3], cursy[4]]
 	};
-	
-	//AnyBalance.trace('курсы МКБ: ' + rates["mkb"]);
-
-
-
-	/* 
-	AnyBalance.setCookie('.aliexpress.ru', 'aep_usuc_f', 'site=rus&region=RU&b_locale=ru_RU&c_tp=' + cur);
-	
-	if(prefs.isDebug)
-	{
-		for(var i=0; i<html.length; i=i+790) AnyBalance.trace(html.substring(i, i+790));
-	}
-	
-	var matches		= html.match(/class="price">\D*([\d\.,]+)/);
-	AnyBalance.trace('Результаты парсинга цены: ' + matches); */
 	
 	return rates;
 }
@@ -84,8 +61,11 @@ function main()
 	} */
 
 	var result = {
-		success	: true,
-		rate	: rates['mkb']['usd'][0]
+		success				: true,
+		rate_mkb_usd_buy	: rates['mkb']['usd'][0],
+		rate_mkb_usd_sell	: rates['mkb']['usd'][1],
+		rate_mkb_eur_buy	: rates['mkb']['eur'][0],
+		rate_mkb_eur_sell	: rates['mkb']['eur'][1]
 	};
 	
 	if(AnyBalance.isAvailable('date'))
