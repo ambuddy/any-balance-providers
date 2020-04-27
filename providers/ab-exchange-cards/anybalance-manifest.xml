@@ -20,14 +20,14 @@
     <history>history.xml</history>
   </files>
   <counters>
-    <counter id="rate_mkb_usd_buy" name="МКБ купит USD" units="р"/>
-    <counter id="rate_mkb_usd_sell" name="МКБ продает USD" units="р"/>
-    <counter id="rate_mkb_eur_buy" name="МКБ купит EUR " units="р"/>
-    <counter id="rate_mkb_eur_sell" name="МКБ продает EUR" units="р"/>
-    <counter id="rate_sber_usd_buy" name="Сбербанк купит USD" units="р"/>
-    <counter id="rate_sber_usd_sell" name="Сбербанк продает USD" units="р"/>
-    <counter id="rate_sber_eur_buy" name="Сбербанк купит EUR " units="р"/>
-    <counter id="rate_sber_eur_sell" name="Сбербанк продает EUR" units="р"/>
+    <counter id="rate_mkb_usd_buy" name="МКБ купит USD" units=" р"/>
+    <counter id="rate_mkb_usd_sell" name="МКБ продает USD" units=" р"/>
+    <counter id="rate_mkb_eur_buy" name="МКБ купит EUR " units=" р"/>
+    <counter id="rate_mkb_eur_sell" name="МКБ продает EUR" units=" р"/>
+    <counter id="rate_sber_usd_buy" name="Сбербанк купит USD" units=" р"/>
+    <counter id="rate_sber_usd_sell" name="Сбербанк продает USD" units=" р"/>
+    <counter id="rate_sber_eur_buy" name="Сбербанк купит EUR " units=" р"/>
+    <counter id="rate_sber_eur_sell" name="Сбербанк продает EUR" units=" р"/>
   </counters>
   <keywords>обмен валют, банк, карты</keywords>
   <type>exchange, rates</type>

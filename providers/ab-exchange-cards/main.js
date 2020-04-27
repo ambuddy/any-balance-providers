@@ -10,6 +10,7 @@ var g_headers = {
 var urls = {
 	'mkb'	: 'https://mkb.ru/exchange-rate',
 	'sber'	: 'https://www.sberbank.ru/ru/quotes/currenciescards'
+	//'sber'	: 'https://www.sberbank.ru/portalserver/proxy/?pipe=shortCachePipe&url=http%3A%2F%2Flocalhost%2Frates-web%2FrateService%2Frate%2Fcurrent%3FregionId%3D77%26rateCategory%3Dcards%26currencyCode%3D978%26currencyCode%3D840'
 };
 
 function getRates(bank)
@@ -76,10 +77,8 @@ function main()
 		result['rate_mkb_eur_sell']		= rates.eur.sell || null;
 	}
 	
-	if(isAvailable('sber', prefs))
-	{
-		var rates	= getRates('sber');
-		
+	if(isAvailable('sber', prefs) && (rates = getRates('sber')))
+	{		
 		result['rate_sber_usd_buy']		= rates.usd.buy || null;
 		result['rate_sber_usd_sell']	= rates.usd.sell || null;
 		result['rate_sber_eur_buy']		= rates.eur.buy || null;
@@ -97,7 +96,9 @@ function isAvailable(bank, prefs)
 	{
 		trace("isAvailable", i, prefs[i], (i.indexOf('counter')>-1 && AnyBalance.isAvailable(prefs[i])));
 		
-		if(i.indexOf('counter')>-1 && prefs[i].indexOf('rate_'+bank)>-1 && AnyBalance.isAvailable(prefs[i])) return true;
+		if(i.indexOf('counter') > -1 && prefs[i] == '--auto--') return true;
+		
+		if(i.indexOf('counter') > -1 && prefs[i].indexOf('rate_'+bank) > -1 && AnyBalance.isAvailable(prefs[i])) return true;
 	}
 	return false;
 }
