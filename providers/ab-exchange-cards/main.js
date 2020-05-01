@@ -9,8 +9,8 @@ var g_headers = {
 
 var urls = {
 	'mkb'	: 'https://mkb.ru/exchange-rate',
-	'sber'	: 'https://www.sberbank.ru/ru/quotes/currenciescards'
-	//'sber'	: 'https://www.sberbank.ru/portalserver/proxy/?pipe=shortCachePipe&url=http%3A%2F%2Flocalhost%2Frates-web%2FrateService%2Frate%2Fcurrent%3FregionId%3D77%26rateCategory%3Dcards%26currencyCode%3D978%26currencyCode%3D840'
+	'sber'	: 'https://www.sberbank.ru/portalserver/proxy/?pipe=shortCachePipe&url=http%3A%2F%2Flocalhost%2Frates-web%2FrateService%2Frate%2Fcurrent%3FregionId%3D77%26rateCategory%3Dcards%26currencyCode%3D978%26currencyCode%3D840'
+	//'sber'	: 'https://www.sberbank.ru/ru/quotes/currenciescards'
 };
 
 function getRates(bank)
@@ -22,12 +22,23 @@ function getRates(bank)
 	if(html)
 	{
 		//var body 	= html.match(/<body([\s\S]+)<\/body>/i)[0];
-		var jQ		= $(html);
 		
 		if(prefs.isDebug) { for(var i=0; i<html.length; i=i+790) trace(html.substring(i, i+790)); }
 		
-		if(bank == 'mkb')
+		if(bank == 'sber')
 		{
+			var cursy 		= JSON.parse(html);
+			var usd			= cursy.cards[840][0];
+			var eur			= cursy.cards[978][0];
+			
+			rates			= {
+					'usd'	: {buy:usd.buyValue, sell:usd.sellValue},
+					'eur'	: {buy:eur.buyValue, sell:eur.sellValue}
+			};
+		}
+		else if(bank == 'mkb')
+		{
+			var jQ			= $(html);
 			var cursy		= jQ.find('div.tabs__content.tabs__content_cards span');						trace('Найдено курсов МКБ:', cursy.length);
 			
 			if(cursy.length)
@@ -36,20 +47,6 @@ function getRates(bank)
 				rates		= {
 					'usd'	: {buy:cursy[0], sell:cursy[1]},
 					'eur'	: {buy:cursy[3], sell:cursy[4]}
-				};
-				cursy.forEach(function(item,i){ trace('Читаем курсы:', i, '=', cursy[i]); });
-			}
-		}
-		else if(bank == 'sber')
-		{
-			var cursy		= jQ.find('span.rates-current__rate-value');									trace('Найдено курсов Сбербанк:', cursy.length);
-			
-			if(cursy.length)
-			{
-				cursy		= $.makeArray(cursy).map(function(item, i){ return parseFloat( $(item).text() ).toFixed(4); });
-				rates		= {
-					'usd'	: {buy:cursy[2], sell:cursy[3]},
-					'eur'	: {buy:cursy[0], sell:cursy[1]}
 				};
 				cursy.forEach(function(item,i){ trace('Читаем курсы:', i, '=', cursy[i]); });
 			}
@@ -69,20 +66,20 @@ function main()
 	var result		= {success: true};
 	var rates		= null;
 	
-	if(isAvailable('mkb', prefs) && (rates = getRates('mkb')))
-	{
-		result['rate_mkb_usd_buy']		= rates.usd.buy || null;
-		result['rate_mkb_usd_sell']		= rates.usd.sell || null;
-		result['rate_mkb_eur_buy']		= rates.eur.buy || null;
-		result['rate_mkb_eur_sell']		= rates.eur.sell || null;
-	}
-	
 	if(isAvailable('sber', prefs) && (rates = getRates('sber')))
 	{		
 		result['rate_sber_usd_buy']		= rates.usd.buy || null;
 		result['rate_sber_usd_sell']	= rates.usd.sell || null;
 		result['rate_sber_eur_buy']		= rates.eur.buy || null;
 		result['rate_sber_eur_sell']	= rates.eur.sell || null;
+	}
+	
+	if(isAvailable('mkb', prefs) && (rates = getRates('mkb')))
+	{
+		result['rate_mkb_usd_buy']		= rates.usd.buy || null;
+		result['rate_mkb_usd_sell']		= rates.usd.sell || null;
+		result['rate_mkb_eur_buy']		= rates.eur.buy || null;
+		result['rate_mkb_eur_sell']		= rates.eur.sell || null;
 	}
 	
 	AnyBalance.setResult(result);
